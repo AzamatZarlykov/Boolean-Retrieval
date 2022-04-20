@@ -1,4 +1,7 @@
-.PHONY: all
+.PHONY: all clear
 
 all:
-	python main.py
+	python3 main.py
+
+clear:
+	rm -rf 10.2452/

@@ -1,10 +1,11 @@
+from collections import defaultdict
 import os
 
 from bs4 import BeautifulSoup
 
 class InvertedIndex:
     def __init__(self, directory="A2/documents_cs") -> None:
-        self.inverted_index = {}
+        self.inverted_index = defaultdict(set)
 
         for filename in os.listdir(directory):
             if filename == "czech.dtd":
@@ -48,13 +49,7 @@ class InvertedIndex:
                 if term.strip() == "":
                     continue
 
-                if term in self.inverted_index:
-                    self.inverted_index[term].add(doc_id)
-                else:
-                    # if term does not exist in the dict add a new set and add the doc_id
-                    self.inverted_index[term] = set()
-                    self.inverted_index[term].add(doc_id)
-                
+                self.inverted_index[term].add(doc_id)
                 term = ""
         
     def collect_content(self, container):
@@ -179,29 +174,32 @@ class QueryEvaluator:
             return posting2 - posting1
             # return difference(posting2, posting1)
 
-    # def intersection(self, a, b):
-    #     if len(a) > len(b):
-    #         a,b = b,a
-    #     res = set()
-    #     for elem in a:
-    #         if elem in b:
-    #             res.add(elem)
-    #     return res
+    def intersection(a, b):
+        if len(a) > len(b):
+            a,b = b,a
+        res = set()
+        for elem in a:
+            if elem in b:
+                res.add(elem)
+        return res
 
-    # def union(self, a, b):
-    #     if len(a) > len(b):
-    #         a,b = b,a
-    #     for elem in a:
-    #         if elem not in b:
-    #             b.add(elem)
-    #     return b   
+    def union(a, b):
+        if len(a) > len(b):
+            a,b = b,a
+        res = set()
+        for elem in a:
+                res.add(elem)
+        for elem in b:
+            if elem not in res:
+                res.add(elem)
+        return res
 
-    # def different(self, a, b):
-    #     res = set()
-    #     for elem in a:
-    #         if elem not in b:
-    #             res.add(elem)
-    #     return res
+    def different(self, a, b):
+        res = set()
+        for elem in a:
+            if elem not in b:
+                res.add(elem)
+        return res
 
 def store(directory_name, file_name, result):
     """
@@ -225,6 +223,5 @@ def main():
         
         store(query_holder.directory, num, res)
 
-    
 if __name__ == "__main__":
     main()
